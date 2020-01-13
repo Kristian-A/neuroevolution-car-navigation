@@ -6,13 +6,30 @@ public class Test : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Matrix m = new Matrix(3, 5);
-		m.set(0, 0, 10);
-		m.set(1, 1, 10);
-		m.set(2, 0, 10);
-		Debug.Log(m.get(0, 0));
-		Debug.Log(m.print());
-		Debug.Log(m.transpolate().print());
+		Matrix inputs = new Matrix(3, 1);
+		inputs.randomize();
+		Matrix ih = new Matrix(2, 3);
+		Matrix ho = new Matrix(2, 2);
+		
+
+		inputs.set(0, 0, 1);
+		inputs.set(1, 0, -1);
+		inputs.set(2, 0, 2);
+
+		ih.set(0, 0, 1); ih.set(1, 0, 2);
+		ih.set(0, 1, 3); ih.set(1, 1, -1);
+		ih.set(0, 2, 5); ih.set(1, 2, -3);
+
+		ho.set(0, 0, 1); ho.set(1, 0, 2);
+		ho.set(0, 1, 3); ho.set(1, 1, 4);
+
+		NeuralNetwork nn = new NeuralNetwork(3, 2, 2);
+		nn.setWeights(ih, ho);
+		Matrix output = nn.feedforward(inputs);
+
+		Debug.Log(output.print());
+		// Debug.Log(weights.print());
+		// Debug.Log((inputs*weights).print());
 	}
 	
 	// Update is called once per frame

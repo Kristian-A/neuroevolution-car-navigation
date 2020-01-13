@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class VectorN {
 
-	private float[] numbers;
+	private double[] numbers;
 	public VectorN(int n) {
-		this.numbers = new float[n];
+		this.numbers = new double[n];
 	}
 
 	public void print() {
@@ -19,7 +19,7 @@ public class VectorN {
 		Debug.Log(ret);
 	}
 
-	public float this[int i] {
+	public double this[int i] {
 		get { return numbers[i]; }
 		set { numbers[i] = value; }
 	} 

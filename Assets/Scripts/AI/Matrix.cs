@@ -1,21 +1,25 @@
+using System;
+
 public class Matrix {
-    private float[][] numbers;
+
+    private double[][] numbers;
     private int width;
     private int height;
+    
     public Matrix(int width, int height) {
-        numbers = new float[height][];
+        numbers = new double[height][];
         for (var y = 0; y < height; y++) {
-            numbers[y] = new float[width];
+            numbers[y] = new double[width];
         }
 
         this.width = width;
         this.height = height;
     }
 
-    public void set(int x, int y, float value) {
+    public void set(int x, int y, double value) {
         numbers[y][x] = value;
     }
-    public float get(int x, int y) {
+    public double get(int x, int y) {
         return numbers[y][x];
     }
 
@@ -41,14 +45,36 @@ public class Matrix {
         return ret;
     }
 
-    public static Matrix operator* (Matrix m1, Matrix m2) {
-        if (m1.width != m2.height) {
+    public void randomize(int seed = 0) {
+        Random generator = new Random(seed);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                set(x, y, (float)generator.NextDouble());
+            }
+        }
+    }
+    public static Matrix operator* (Matrix a, Matrix b) {
+        if (a.width != b.height) {
             return null;
         }
+        Matrix res = new Matrix(b.width, a.height);
+        b = b.transpolate();
+        for (int ah = 0; ah < a.height; ah++) {
+            for (int bh = b.height-1; bh >= 0; bh--) {
+                double sum = 0;
+                for (int i = 0; i < a.width; i++) {
+                    sum += a.get(i, ah) * b.get(i, bh);
+                }
+                res.set(b.height-bh-1, ah, sum);
+            }
+        }
+        return res;
+    }
 
-        for (int i = 0; i < m1.width; i++) {
-            for (int j = 0; j < m2.height; j++) {
-                
+    public void activate(Func<double, double> activation) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                set(x, y, activation(get(x, y)));
             }
         }
     }
