@@ -9,7 +9,7 @@ public class VectorN {
 		this.numbers = new double[n];
 	}
 
-	public void print() {
+	public void Print() {
 		var ret = "[ ";
 		foreach (var number in numbers) {
 			ret += number;

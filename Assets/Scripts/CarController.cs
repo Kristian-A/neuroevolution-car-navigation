@@ -6,12 +6,13 @@ public class CarController : MonoBehaviour {
 
 	public int carCount = 2;
 	public GameObject carPrefab;
+	private static List<GameObject> cars;
 
 	void Start () {
-		List<GameObject> cars = new List<GameObject>();
+		CarController.cars = new List<GameObject>();
 
 		for (int i = 0; i < carCount; i++) {
-			cars.Add(Instantiate(carPrefab, new Vector3(i*2, 3, 0), Quaternion.identity));
+			CarController.cars.Add(Instantiate(carPrefab, new Vector3(i*2, 3, 0), Quaternion.identity));
 		}
 	
 		foreach (GameObject first in cars) {
@@ -26,6 +27,15 @@ public class CarController : MonoBehaviour {
 		}
 	}
 	
+	public static List<GameObject> GetCars() {
+		return cars;
+	}
+
+
+	public static bool Ready() {
+		return cars.Count != 0;
+	}
+
 	private void DisableCollisions(List<Collider> first, List<Collider> second) {
 		foreach (Collider fCol in first) {
 			foreach (Collider sCol in second) {
@@ -33,4 +43,5 @@ public class CarController : MonoBehaviour {
 			}
 		}
 	}
+
 }

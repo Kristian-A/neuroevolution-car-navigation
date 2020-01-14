@@ -24,6 +24,14 @@ public class CarMovement : MonoBehaviour {
 	public List<Axle> axles;
 	public float maxSteer = 40;
 	public float motorForce = 50;
+	public List<GameObject> sensors;
+	private NeuralNetwork brain;
+
+
+	public void SetBrain(NeuralNetwork brain) {
+		this.brain = brain;
+	}
+
 	public void Steer(float amount) {
 		foreach (Axle axle in axles) {
 			if (axle.steer) {
@@ -76,9 +84,16 @@ public class CarMovement : MonoBehaviour {
 				Brake(0);
 			}
 		} else {
-			Steer(steer);
-			Accelerate(acceleration);
-			Brake(brake);
+			Matrix inputs = new Matrix(6, 1);
+			for (int i = 0; i < 6; i++) {
+				inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
+			}
+			
+			Matrix outputs = brain.FeedForward(inputs);
+			print(outputs.Print());
+			Steer((float)outputs.Get(0, 0));
+			Accelerate((float)outputs.Get(1, 0));
+			// Brake((float)outputs.Get(2, 0));
 		}
 		RotateAxles();
 	}

@@ -16,14 +16,14 @@ public class Matrix {
         this.height = height;
     }
 
-    public void set(int x, int y, double value) {
+    public void Set(int x, int y, double value) {
         numbers[y][x] = value;
     }
-    public double get(int x, int y) {
+    public double Get(int x, int y) {
         return numbers[y][x];
     }
 
-    public string print() {
+    public string Print() {
         var ret = "";
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -35,21 +35,21 @@ public class Matrix {
         return ret;
     }
 
-    public Matrix transpolate() {
+    public Matrix Transpolate() {
         var ret = new Matrix(height, width);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                ret.set(y, ret.height-x-1, get(x, y));
+                ret.Set(y, ret.height-x-1, Get(x, y));
             }
         }
         return ret;
     }
 
-    public void randomize(int seed = 0) {
+    public void Randomize(int seed = 0) {
         Random generator = new Random(seed);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                set(x, y, (float)generator.NextDouble());
+                Set(x, y, (float)generator.NextDouble());
             }
         }
     }
@@ -58,23 +58,23 @@ public class Matrix {
             return null;
         }
         Matrix res = new Matrix(b.width, a.height);
-        b = b.transpolate();
+        b = b.Transpolate();
         for (int ah = 0; ah < a.height; ah++) {
             for (int bh = b.height-1; bh >= 0; bh--) {
                 double sum = 0;
                 for (int i = 0; i < a.width; i++) {
-                    sum += a.get(i, ah) * b.get(i, bh);
+                    sum += a.Get(i, ah) * b.Get(i, bh);
                 }
-                res.set(b.height-bh-1, ah, sum);
+                res.Set(b.height-bh-1, ah, sum);
             }
         }
         return res;
     }
 
-    public void activate(Func<double, double> activation) {
+    public void Activate(Func<double, double> activation) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                set(x, y, activation(get(x, y)));
+                Set(x, y, activation(Get(x, y)));
             }
         }
     }

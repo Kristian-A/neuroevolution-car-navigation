@@ -6,11 +6,15 @@ public class Sensor : MonoBehaviour {
 
 	public GameObject car;
 	private Material material;
+	private double currentDistance = 10;
 	void Start () {
 		material = GetComponent<Renderer>().material;
 	}
 
-	float Distance(Collider other) {
+	public double GetDistance() {
+		return currentDistance;
+	}
+	private double Distance(Collider other) {
 		if (other.tag == "Agent" || other.tag == "Sensor") {
 			return 3;
 		
@@ -19,18 +23,18 @@ public class Sensor : MonoBehaviour {
 		return Vector3.Distance(other.ClosestPoint(carPos), carPos); 
 	}
 
-	Vector3 GetCarPosition() {
+	private Vector3 GetCarPosition() {
 		return car.GetComponent<Transform>().position;
 	}
 
-	void OnTriggerStay(Collider other) {
-		float dist = Distance(other);
+	public void OnTriggerStay(Collider other) {
+		currentDistance = Distance(other);
 		Color color; 
-		if (dist < 1.5f) {
+		if (currentDistance < 1.5) {
 			color = new Color(1, 0, 0);
-		} else if (dist < 1.8f) {
+		} else if (currentDistance < 1.8) {
 			color = new Color(1, 1, 0);
-		} else if (dist < 2.1f) {
+		} else if (currentDistance < 2.1) {
 			color = new Color(0, 1, 0);
 		} else {
 			color = new Color (1, 1, 1);
@@ -38,7 +42,7 @@ public class Sensor : MonoBehaviour {
 		material.SetColor("_Color", color);
 	} 
 
-	void OnTriggerExit() {
+	public void OnTriggerExit() {
 		material.SetColor("_Color", Color.white);
 	}
 }

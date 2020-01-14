@@ -6,20 +6,20 @@ public class NeuralNetwork {
     private Func<double, double> activation = x => Math.Tanh(x);
     public NeuralNetwork(int inputs, int hidden, int outputs) {
         w_ih = new Matrix(hidden, inputs);
-        w_ih.randomize();
+        w_ih.Randomize();
         w_ho = new Matrix(outputs, hidden);
-        w_ho.randomize();
+        w_ho.Randomize();
     }
 
-    public void setWeights(Matrix ih, Matrix ho) {
+    public void SetWeights(Matrix ih, Matrix ho) {
         w_ih = ih;
         w_ho = ho;
     }
-    public Matrix feedforward(Matrix inputs) {
+    public Matrix FeedForward(Matrix inputs) {
         Matrix result = inputs*w_ih;
-        result.activate(activation);
+        result.Activate(activation);
         result = result*w_ho;
-        result.activate(activation);
+        result.Activate(activation);
         return result;
     }
 }

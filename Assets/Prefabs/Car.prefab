@@ -1278,6 +1278,13 @@ MonoBehaviour:
     engine: 1
   maxSteer: 40
   motorForce: 200
+  sensors:
+  - {fileID: 1973992188783118}
+  - {fileID: 1023951092116292}
+  - {fileID: 1575360965783010}
+  - {fileID: 1804692157217216}
+  - {fileID: 1266201853983870}
+  - {fileID: 1295757710113484}
 --- !u!114 &114079289251592982
 MonoBehaviour:
   m_ObjectHideFlags: 1
