@@ -49,7 +49,7 @@ public class Matrix {
         Random generator = new Random(seed);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                Set(x, y, (float)generator.NextDouble());
+                Set(x, y, ((double)generator.NextDouble())*2 - 1);
             }
         }
     }

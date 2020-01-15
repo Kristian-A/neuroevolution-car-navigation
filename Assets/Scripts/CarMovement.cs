@@ -51,15 +51,6 @@ public class CarMovement : MonoBehaviour {
 		}
 	}
 
-	public void Brake(float amount) {
-		foreach (Axle axle in axles) {
-			if (axle.engine) {
-				foreach (Wheel wheel in axle.wheels) {
-					wheel.collider.brakeTorque = amount*motorForce*2;
-				}
-			}
-		}
-	}
 	public void RotateAxles() {
 		foreach (Axle axle in axles) {
 			foreach (Wheel wheel in axle.wheels) {
@@ -77,21 +68,21 @@ public class CarMovement : MonoBehaviour {
 		if (keyboardControl) {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
-			if (Input.GetKey("space")) {
-				Brake(1);
-			} else {
-				Brake(0);
-			}
 		} else {
+			if (!AIController.Ready()) {
+				print("chakam");
+				return;
+			}
 			Matrix inputs = new Matrix(6, 1);
 			for (int i = 0; i < 6; i++) {
 				inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
 			}
+			// print(brain);
+			// print(inputs);
 			var outputs = brain.FeedForward(inputs);
-			print(outputs.Print());
+			// print(outputs.Print());
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));
-			// Brake((float)outputs.Get(2, 0));
 		}
 		RotateAxles();
 	}

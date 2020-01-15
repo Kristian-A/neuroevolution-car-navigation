@@ -4,19 +4,25 @@ using UnityEngine;
 
 public class AIController : MonoBehaviour {
 
+	private static bool createdBrains = false;
     public void Start() {
-    }
+	}
 
 	public void Update() {
-		if (!CarController.Ready()) {
-			print("hui");
+		if (!CarController.Ready() || createdBrains) {
 			return;
 		}
-
+		
 		List<GameObject> cars = CarController.GetCars();
+        
+		foreach (GameObject car in cars) {
+		    car.GetComponent<CarMovement>().SetBrain(new NeuralNetwork(6, 15, 2));
+		}
+		
+		createdBrains = true;
+	}
 
-        foreach (GameObject car in cars) {
-            car.GetComponent<CarMovement>().SetBrain(new NeuralNetwork(6, 15, 3));
-        }
+	public static bool Ready() {
+		return createdBrains;
 	}
 }

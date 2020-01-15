@@ -7,13 +7,16 @@ public class CarController : MonoBehaviour {
 	public int carCount = 2;
 	public GameObject carPrefab;
 	private static List<GameObject> cars;
+	private static bool ready = false;
 
 	void Start () {
 		CarController.cars = new List<GameObject>();
-
+		Debug.Log(carCount);
 		for (int i = 0; i < carCount; i++) {
 			CarController.cars.Add(Instantiate(carPrefab, new Vector3(i*2, 3, 0), Quaternion.identity));
 		}
+
+		ready = true;
 	
 		foreach (GameObject first in cars) {
 			List<Collider> fColls = first.GetComponent<CarMovement>().GetColliders();
@@ -33,7 +36,7 @@ public class CarController : MonoBehaviour {
 
 
 	public static bool Ready() {
-		return cars.Count != 0;
+		return ready;
 	}
 
 	private void DisableCollisions(List<Collider> first, List<Collider> second) {

@@ -1260,7 +1260,7 @@ MonoBehaviour:
   acceleration: 0
   steer: 0
   brake: 0
-  keyboardControl: 1
+  keyboardControl: 0
   axles:
   - wheels:
     - transform: {fileID: 4896501858848022}
