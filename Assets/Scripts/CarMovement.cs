@@ -27,7 +27,6 @@ public class CarMovement : MonoBehaviour {
 	public List<GameObject> sensors;
 	private NeuralNetwork brain;
 
-
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;
 	}
@@ -88,8 +87,7 @@ public class CarMovement : MonoBehaviour {
 			for (int i = 0; i < 6; i++) {
 				inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
 			}
-			
-			Matrix outputs = brain.FeedForward(inputs);
+			var outputs = brain.FeedForward(inputs);
 			print(outputs.Print());
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));

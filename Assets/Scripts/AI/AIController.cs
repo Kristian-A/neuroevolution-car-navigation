@@ -5,11 +5,11 @@ using UnityEngine;
 public class AIController : MonoBehaviour {
 
     public void Start() {
-
     }
 
 	public void Update() {
 		if (!CarController.Ready()) {
+			print("hui");
 			return;
 		}
 

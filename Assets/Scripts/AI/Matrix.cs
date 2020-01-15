@@ -55,7 +55,7 @@ public class Matrix {
     }
     public static Matrix operator* (Matrix a, Matrix b) {
         if (a.width != b.height) {
-            return null;
+            return new Matrix(1, 1);
         }
         Matrix res = new Matrix(b.width, a.height);
         b = b.Transpolate();
