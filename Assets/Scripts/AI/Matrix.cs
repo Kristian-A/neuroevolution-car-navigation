@@ -5,6 +5,8 @@ public class Matrix {
     private double[][] numbers;
     private int width;
     private int height;
+        
+    private static Random generator = new Random();
     
     public Matrix(int width, int height) {
         numbers = new double[height][];
@@ -45,11 +47,10 @@ public class Matrix {
         return ret;
     }
 
-    public void Randomize(int seed = 0) {
-        Random generator = new Random(seed);
+    public void Randomize(int seed = 130) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                Set(x, y, ((double)generator.NextDouble())*2 - 1);
+                Set(x, y, ((double)Matrix.generator.NextDouble())*2 - 1);
             }
         }
     }
@@ -77,5 +78,9 @@ public class Matrix {
                 Set(x, y, activation(Get(x, y)));
             }
         }
+    }
+
+    public static void setSeed(int seed) {
+        generator = new Random(seed);
     }
 }

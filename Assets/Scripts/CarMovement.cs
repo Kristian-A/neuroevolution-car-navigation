@@ -70,17 +70,13 @@ public class CarMovement : MonoBehaviour {
 			Accelerate(Input.GetAxis("Vertical"));
 		} else {
 			if (!AIController.Ready()) {
-				print("chakam");
 				return;
 			}
 			Matrix inputs = new Matrix(6, 1);
 			for (int i = 0; i < 6; i++) {
 				inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
 			}
-			// print(brain);
-			// print(inputs);
 			var outputs = brain.FeedForward(inputs);
-			// print(outputs.Print());
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));
 		}

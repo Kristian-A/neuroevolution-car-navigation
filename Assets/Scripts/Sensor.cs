@@ -9,6 +9,7 @@ public class Sensor : MonoBehaviour {
 	private double currentDistance = 10;
 	void Start () {
 		material = GetComponent<Renderer>().material;
+		print(material);
 	}
 
 	public double GetDistance() {
@@ -28,16 +29,18 @@ public class Sensor : MonoBehaviour {
 	}
 
 	public void OnTriggerStay(Collider other) {
+		if (!material) {
+			return;
+		}
+
 		currentDistance = Distance(other);
-		Color color; 
+		Color color = new Color (1, 1, 1); 
 		if (currentDistance < 1.5) {
 			color = new Color(1, 0, 0);
 		} else if (currentDistance < 1.8) {
 			color = new Color(1, 1, 0);
 		} else if (currentDistance < 2.1) {
 			color = new Color(0, 1, 0);
-		} else {
-			color = new Color (1, 1, 1);
 		}
 		material.SetColor("_Color", color);
 	} 

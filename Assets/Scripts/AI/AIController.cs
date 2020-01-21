@@ -5,6 +5,8 @@ using UnityEngine;
 public class AIController : MonoBehaviour {
 
 	private static bool createdBrains = false;
+	private static int seed = 0;
+
     public void Start() {
 	}
 
