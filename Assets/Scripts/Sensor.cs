@@ -9,14 +9,13 @@ public class Sensor : MonoBehaviour {
 	private double currentDistance = 10;
 	void Start () {
 		material = GetComponent<Renderer>().material;
-		print(material);
 	}
 
 	public double GetDistance() {
 		return currentDistance;
 	}
 	private double Distance(Collider other) {
-		if (other.tag == "Agent" || other.tag == "Sensor") {
+		if (CollisionController.IsIgnored(other.tag)) {
 			return 3;
 		
 		}
