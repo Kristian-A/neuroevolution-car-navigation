@@ -2,34 +2,30 @@ using System;
 
 public class Matrix {
 
-    private double[][] numbers;
+    private double[,] numbers;
     private int width;
     private int height;
         
     private static Random generator = new Random();
     
     public Matrix(int width, int height) {
-        numbers = new double[height][];
-        for (var y = 0; y < height; y++) {
-            numbers[y] = new double[width];
-        }
-
+        numbers = new double[height, width];
         this.width = width;
         this.height = height;
     }
 
     public void Set(int x, int y, double value) {
-        numbers[y][x] = value;
+        numbers[y, x] = value;
     }
     public double Get(int x, int y) {
-        return numbers[y][x];
+        return numbers[y, x];
     }
 
     public string Print() {
         var ret = "";
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                ret += numbers[y][x];
+                ret += numbers[y, x];
                 ret += " ";
             }
             ret += "\n";

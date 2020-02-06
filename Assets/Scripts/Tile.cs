@@ -7,9 +7,14 @@ public class Tile : MonoBehaviour {
 	private Material material;
 	private bool isWall = false;
 	private float alpha = 0.3f;
+	private Vector2 pos;
 
 	public void Start() {
 		material = GetComponent<Renderer>().material;
+	}
+
+	public void setPos(Vector2 pos) {
+		this.pos = pos;
 	}
 
 	public void OnTriggerStay(Collider other) {
@@ -27,5 +32,16 @@ public class Tile : MonoBehaviour {
 
 	public bool IsWall() {
 		return isWall;
+	}
+
+	public override bool Equals(object obj) {
+		Tile other = (Tile)obj;
+		return pos.Equals(other.pos);
+	}
+
+	public override int GetHashCode() {
+		int hash = 13;
+		hash = (hash * 7) + pos.GetHashCode();
+    	return hash;
 	}
 }
