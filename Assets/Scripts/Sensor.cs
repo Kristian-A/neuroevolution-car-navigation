@@ -7,7 +7,8 @@ public class Sensor : MonoBehaviour {
 	public GameObject car;
 	private Material material;
 	private double currentDistance = 10;
-	void Start () {
+	
+	void Awake () {
 		material = GetComponent<Renderer>().material;
 	}
 
@@ -28,10 +29,6 @@ public class Sensor : MonoBehaviour {
 	}
 
 	public void OnTriggerStay(Collider other) {
-		if (!material) {
-			return;
-		}
-
 		currentDistance = Distance(other);
 		Color color = new Color (1, 1, 1); 
 		if (currentDistance < 1.5) {
