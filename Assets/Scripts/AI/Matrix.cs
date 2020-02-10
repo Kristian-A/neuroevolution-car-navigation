@@ -4,8 +4,7 @@ public class Matrix {
 
     private double[,] numbers;
     private int width;
-    private int height;
-        
+    private int height;   
     private static Random generator = new Random();
     
     public Matrix(int width, int height) {
@@ -50,6 +49,9 @@ public class Matrix {
             }
         }
     }
+    public int GetWidth() {
+        return width;
+    }
     public static Matrix operator* (Matrix a, Matrix b) {
         if (a.width != b.height) {
             return new Matrix(1, 1);
@@ -76,7 +78,7 @@ public class Matrix {
         }
     }
 
-    public static void setSeed(int seed) {
+    public static void SetSeed(int seed) {
         generator = new Random(seed);
     }
 }
