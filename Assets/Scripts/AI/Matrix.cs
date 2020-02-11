@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class Matrix {
 
@@ -52,6 +53,10 @@ public class Matrix {
     public int GetWidth() {
         return width;
     }
+
+    public int GetHeight() {
+        return height;
+    }
     public static Matrix operator* (Matrix a, Matrix b) {
         if (a.width != b.height) {
             return new Matrix(1, 1);
@@ -80,5 +85,13 @@ public class Matrix {
 
     public static void SetSeed(int seed) {
         generator = new Random(seed);
+    }
+
+    public IEnumerator<double> GetEnumerator() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                yield return numbers[y, x];
+            }
+        }
     }
 }
