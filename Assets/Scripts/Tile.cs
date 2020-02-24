@@ -8,12 +8,13 @@ public class Tile : MonoBehaviour {
 	private bool isWall = false;
 	private float alpha = 0.3f;
 	private Vector2 pos;
+	private Vector3 worldPos;
 
 	private int gCost;
 	private int hCost;
 	private Tile previous;
 
-	public bool isPath = false;
+	private bool isPath = false;
 
 	public void Awake() {
 		material = GetComponent<Renderer>().material;
@@ -35,6 +36,13 @@ public class Tile : MonoBehaviour {
 
 	public Vector2 GetPos() {
 		return pos;
+	}
+
+	public void SetWorldPos(Vector3 worldPos) {
+		this.worldPos = worldPos;
+	}
+	public Vector3 GetWorldPos() {
+		return worldPos;
 	}
 
 	public int Fcost() {
@@ -65,6 +73,14 @@ public class Tile : MonoBehaviour {
 		return isWall;
 	}
 
+	public void SetPath() {
+		isPath = true;
+	}
+
+	public bool IsPath() {
+		return isPath;
+	}
+
 	public void Reset() {
 		gCost = 0;
 		hCost = 0;
@@ -73,6 +89,10 @@ public class Tile : MonoBehaviour {
 	}
 
 	public void OnTriggerStay(Collider other) {
+		if (other.tag == "Agent") {
+			other.GetComponent<CarMovement>().OnRoad();
+		}
+
 		if (CollisionController.IsIgnored(other.tag)) {	
 			return;
 		}

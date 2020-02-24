@@ -9,8 +9,8 @@ public class TileController : MonoBehaviour {
 	public GameObject tilePrefab;
 	public Vector2 start;
 	public Vector2 end;
-
 	private static Tile[,] tileMap;
+	private static List<Tile> path;
 
 	void Start () {
 		float tileScale = tilePrefab.GetComponent<Transform>().localScale.x;
@@ -29,6 +29,7 @@ public class TileController : MonoBehaviour {
 				GameObject tileObject = Instantiate(tilePrefab, startPos + new Vector3(x * tileScale * xDir, 0, z * tileScale * zDir), Quaternion.identity);
 				Tile tile = tileObject.GetComponent<Tile>();
 				tile.SetPos(new Vector2(x, z));
+				tile.SetWorldPos(tileObject.GetComponent<Transform>().position);
 				TileController.tileMap[z, x] = tile;
 			}
 		}
@@ -40,8 +41,7 @@ public class TileController : MonoBehaviour {
 		Tile startTile = TileController.tileMap[(int)start.y, (int)start.x];
 		Tile endTile = TileController.tileMap[(int)end.y, (int)end.x];
 
-		PathFinding.FindPath(startTile, endTile);	
-
+		TileController.path = PathFinding.FindPath(startTile, endTile);	
 	}
 
 	public static void Reset() {
@@ -73,5 +73,9 @@ public class TileController : MonoBehaviour {
 		}
 
 		return neighbours;
+	}
+
+	public static List<Tile> GetPath() {
+		return path == null ? null : new List<Tile>(path);
 	}
 }

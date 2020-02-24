@@ -70,7 +70,7 @@ public class PathFinding : MonoBehaviour {
 
 		path.Reverse();
 		foreach (Tile tile in path) {
-			tile.isPath = true;
+			tile.SetPath();
 		}
 
 		return path;

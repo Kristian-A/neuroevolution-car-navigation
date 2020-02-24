@@ -26,9 +26,13 @@ public class CarMovement : MonoBehaviour {
 	public float motorForce = 50;
 	public List<GameObject> sensors;
 	private NeuralNetwork brain;
+	private List<Tile> path;
+	private Tile currentTile;
+	private int completedTiles = 0;
+	private bool onRoad = false;
 
 	public void SetBrain(NeuralNetwork brain) {
-		this.brain = brain;
+		this.brain = brain;	
 	}
 
 	public void Steer(float amount) {
@@ -40,7 +44,6 @@ public class CarMovement : MonoBehaviour {
 			}
 		}
 	}
-
 	public void Accelerate(float amount) {
 		foreach (Axle axle in axles) {
 			if (axle.engine) {
@@ -68,19 +71,52 @@ public class CarMovement : MonoBehaviour {
 		if (keyboardControl) {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
-		} else {
-			if (!AIController.Ready()) {
-				return;
-			}
-			Matrix inputs = new Matrix(6, 1);
-			for (int i = 0; i < 6; i++) {
-				inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
-			}
-			var outputs = brain.FeedForward(inputs);
+		} else {			
+			Matrix outputs = this.Think();
+
 			Steer((float)outputs.Get(0, 0));
-			Accelerate((float)outputs.Get(1, 0));
+			Accelerate((float)outputs.Get(1, 0));		
 		}
+
 		RotateAxles();
+	}
+
+	private Matrix Think() {
+		Matrix inputs = new Matrix(8, 1);
+		
+		for (int i = 0; i < 6; i++) {
+			inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
+		}
+
+		if (path == null) {
+			path = TileController.GetPath();
+		}
+
+		if (path != null && currentTile == null) {
+			SetNextTile();
+		} 
+
+		if (currentTile != null) {
+			Vector3 carPos = transform.position;
+			Vector3 distance = currentTile.GetWorldPos() - carPos;
+			
+			inputs.Set(6, 0, distance.x);
+			inputs.Set(7, 0, distance.z);
+			
+			if (distance.magnitude < 1) {
+				SetNextTile();	
+				completedTiles += 1;
+			}
+		}
+		
+		return brain.FeedForward(inputs);
+	}
+
+	private void SetNextTile() {
+		if (path.Count == completedTiles) {
+			return;
+		}
+		currentTile = path[completedTiles];
 	}
 
 	public List<Collider> GetColliders() {
@@ -95,4 +131,15 @@ public class CarMovement : MonoBehaviour {
 		return colliders;
 	}
 
+	public double GetCompletedTiles() {
+		return completedTiles;
+	}
+
+	public bool IsOnRoad() {
+		return onRoad;
+	}
+
+	public void OnRoad() {
+		onRoad = true;
+	}
 }

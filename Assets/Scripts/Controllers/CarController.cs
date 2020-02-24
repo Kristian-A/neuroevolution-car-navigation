@@ -7,9 +7,8 @@ public class CarController : MonoBehaviour {
 	public int carCount = 2;
 	public GameObject carPrefab;
 	private static List<GameObject> cars;
-	private static bool ready = false;
 
-	void Start () {
+	void Start() {
 		CarController.cars = new List<GameObject>();
 		for (int i = 0; i < carCount; i++) {
 			var car = Instantiate(carPrefab, new Vector3(0, 3, 0), Quaternion.identity);
@@ -23,16 +22,16 @@ public class CarController : MonoBehaviour {
 				DisableCollisions(colls, other.GetComponent<CarMovement>().GetColliders());
 			}
 		}
-		ready = true;
+	}
+
+	void FixedUpdate() {
+		foreach (GameObject car in CarController.cars) {
+			// print(car.GetComponent<CarMovement>().GetCompletedTiles());
+		}
 	}
 	
 	public static List<GameObject> GetCars() {
 		return cars;
-	}
-
-
-	public static bool Ready() {
-		return ready;
 	}
 
 	private void DisableCollisions(List<Collider> first, List<Collider> second) {

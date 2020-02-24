@@ -34,7 +34,7 @@ public class NeuralNetwork {
 
     public List<double> DNA() {
         List<double> dna = new List<double>();
-        foreach (Matrix m in new Matrix[] {w_ih, w_ho}) {
+        foreach (Matrix m in new Matrix[] { w_ih, w_ho }) {
             foreach (double weight in m) {
                 dna.Add(weight);
             }
@@ -45,7 +45,7 @@ public class NeuralNetwork {
 
     public void SetWeights(List<double> dna) {
         int dnaIndex = 0;
-        foreach (Matrix m in new Matrix[] {w_ih, w_ho}) {
+        foreach (Matrix m in new Matrix[] { w_ih, w_ho }) {
             for (int y = 0; y < m.GetHeight(); y++) {
                 for (int x = 0; x < m.GetWidth(); x++) {
                     m.Set(x, y, dna[dnaIndex++]);

@@ -5,7 +5,7 @@ class GeneticAlgorithm {
 
     public class Entry {
 
-        public List<Double> dna;
+        private List<Double> dna;
         private double fitness;
         public Entry(List<Double> dna, double fitness) {
             this.dna = dna;
@@ -75,7 +75,6 @@ class GeneticAlgorithm {
             double currentProb = entry.GetProbability(sumFitness); 
 
             if (generator.NextDouble() < currentProb + previousProb) {
-                entry.dna.Add(currentProb);
                 return entry;
             }
             previousProb += currentProb;
