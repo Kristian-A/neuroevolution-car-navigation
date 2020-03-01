@@ -30,6 +30,7 @@ public class CarMovement : MonoBehaviour {
 	private Tile currentTile;
 	private int completedTiles = 0;
 	private bool onRoad = false;
+	private 
 
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;	
@@ -71,8 +72,11 @@ public class CarMovement : MonoBehaviour {
 		if (keyboardControl) {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
+
+			CurrentAccuracy();
+
 		} else {			
-			Matrix outputs = this.Think();
+			Matrix outputs = Think();
 
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));		
@@ -134,12 +138,29 @@ public class CarMovement : MonoBehaviour {
 	public double GetCompletedTiles() {
 		return completedTiles;
 	}
+	
+	private float CurrentAccuracy() {
+		float rot = (float)transform.rotation.eulerAngles.y;
+		
+		int smallestDiff = 45;
 
-	public bool IsOnRoad() {
-		return onRoad;
+		for (int degrees = 0; degrees < 360; degrees += 45) {
+			int diff = (int)Mathf.Abs(rot - degrees);
+
+			if (diff < smallestDiff) {
+				smallestDiff = diff;
+			}
+		}
+
+
+		print(100 - Map(smallestDiff, 0, 22, 0, 100));
+		return (int)smallestDiff == 0 ? 1 : 1f/(int)smallestDiff;
 	}
 
-	public void OnRoad() {
-		onRoad = true;
+	private float Map(float value, float oldMin, float oldMax, float newMin, float newMax) {
+		float oldRange = oldMax - oldMin;
+		float newRange = newMax - newMin;
+	
+		return (value / oldRange) * newRange + newMin;
 	}
 }

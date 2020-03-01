@@ -89,10 +89,6 @@ public class Tile : MonoBehaviour {
 	}
 
 	public void OnTriggerStay(Collider other) {
-		if (other.tag == "Agent") {
-			other.GetComponent<CarMovement>().OnRoad();
-		}
-
 		if (CollisionController.IsIgnored(other.tag)) {	
 			return;
 		}
