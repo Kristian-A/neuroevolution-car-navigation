@@ -32,6 +32,16 @@ public class CarMovement : MonoBehaviour {
 	private float accSum = 0;
 	private int accSumCount = 0;
 	private float lastAccuracy;
+	private List<GameObject> collidingTiles = new List<GameObject>(); 
+	private Timer tileTimer = new Timer(195);
+	private Timer accuracyTimer = new Timer(200);
+
+	public void OnTriggerStay(Collider other) {
+		if (other.tag == "Tile" && !collidingTiles.Contains(other.gameObject)) {
+			collidingTiles.Add(other.gameObject);
+		}  
+	} 
+
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;	
 	}
@@ -73,6 +83,7 @@ public class CarMovement : MonoBehaviour {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
 
+			
 
 		} else {			
 			Matrix outputs = Think();
@@ -81,9 +92,9 @@ public class CarMovement : MonoBehaviour {
 			Accelerate((float)outputs.Get(1, 0));		
 		}
 
-		RotateAxles();
 		UpdateAccuracy();
-
+		RotateAxles();
+		print(IsOnPath());
 	}
 
 	private Matrix Think() {
@@ -137,28 +148,44 @@ public class CarMovement : MonoBehaviour {
 	}
 	
 	private float UpdateAccuracy() {		
-		float rot = (float)transform.rotation.eulerAngles.y;
-		
-		int smallestDiff = 45;
+		if (accuracyTimer.IsElapsed()) {
+			float rot = (float)transform.rotation.eulerAngles.y;
+			
+			int smallestDiff = 45;
 
-		for (int degrees = 0; degrees < 360; degrees += 45) {
-			int diff = (int)Mathf.Abs(rot - degrees);
+			for (int degrees = 0; degrees < 360; degrees += 45) {
+				int diff = (int)Mathf.Abs(rot - degrees);
 
-			if (diff < smallestDiff) {
-				smallestDiff = diff;
+				if (diff < smallestDiff) {
+					smallestDiff = diff;
+				}
+			}
+
+			float currentAcc;
+			if ((int)smallestDiff == 0) {
+				currentAcc = 1;
+			} else {
+				currentAcc = 1f/(int)smallestDiff;
+			}
+
+			accSum += currentAcc;	
+			accSumCount++;
+
+			collidingTiles = new List<GameObject>();
+			tileTimer.Reset();
+		}
+
+		lastAccuracy = accSum / accSumCount;
+		return lastAccuracy;
+	}
+
+	private bool IsOnPath() {
+		foreach (GameObject obj in collidingTiles) {
+			if (obj.GetComponent<Tile>().IsPath()) {
+				return true;
 			}
 		}
-
-		float currentAcc;
-		if ((int)smallestDiff == 0) {
-			currentAcc = 1;
-		} else {
-			currentAcc = 1f/(int)smallestDiff;
-		}
-
-		accSum +=  currentAcc;	
-		lastAccuracy = accSum / ++accSumCount;
-		return lastAccuracy;
+		return false;
 	}
 
 	public float Fitness() {
