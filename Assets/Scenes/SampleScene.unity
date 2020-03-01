@@ -686,7 +686,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231ffe454f65d4c7e98145d4cfa351d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: -2, y: 1, z: 2}
+  startPos: {x: -2, y: 0.5, z: 2}
   endPos: {x: 15, y: 0, z: -8}
   tilePrefab: {fileID: 1305201601906048, guid: f6d2e727522e44afb9c75a90a34cc89d, type: 2}
   start: {x: 0, y: 0}

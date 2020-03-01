@@ -94,7 +94,6 @@ public class CarMovement : MonoBehaviour {
 
 		UpdateAccuracy();
 		RotateAxles();
-		print(IsOnPath());
 	}
 
 	private Matrix Think() {
@@ -168,7 +167,7 @@ public class CarMovement : MonoBehaviour {
 				currentAcc = 1f/(int)smallestDiff;
 			}
 
-			accSum += currentAcc;	
+			accSum += IsOnPath() ? currentAcc : 0;	
 			accSumCount++;
 
 			collidingTiles = new List<GameObject>();
