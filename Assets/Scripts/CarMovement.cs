@@ -29,9 +29,9 @@ public class CarMovement : MonoBehaviour {
 	private List<Tile> path;
 	private Tile currentTile;
 	private int completedTiles = 0;
-	private bool onRoad = false;
-	private 
-
+	private float accSum = 0;
+	private int accSumCount = 0;
+	private float lastAccuracy;
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;	
 	}
@@ -73,7 +73,6 @@ public class CarMovement : MonoBehaviour {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
 
-			CurrentAccuracy();
 
 		} else {			
 			Matrix outputs = Think();
@@ -83,6 +82,8 @@ public class CarMovement : MonoBehaviour {
 		}
 
 		RotateAxles();
+		UpdateAccuracy();
+
 	}
 
 	private Matrix Think() {
@@ -134,12 +135,8 @@ public class CarMovement : MonoBehaviour {
 
 		return colliders;
 	}
-
-	public double GetCompletedTiles() {
-		return completedTiles;
-	}
 	
-	private float CurrentAccuracy() {
+	private float UpdateAccuracy() {		
 		float rot = (float)transform.rotation.eulerAngles.y;
 		
 		int smallestDiff = 45;
@@ -152,15 +149,19 @@ public class CarMovement : MonoBehaviour {
 			}
 		}
 
+		float currentAcc;
+		if ((int)smallestDiff == 0) {
+			currentAcc = 1;
+		} else {
+			currentAcc = 1f/(int)smallestDiff;
+		}
 
-		print(100 - Map(smallestDiff, 0, 22, 0, 100));
-		return (int)smallestDiff == 0 ? 1 : 1f/(int)smallestDiff;
+		accSum +=  currentAcc;	
+		lastAccuracy = accSum / ++accSumCount;
+		return lastAccuracy;
 	}
 
-	private float Map(float value, float oldMin, float oldMax, float newMin, float newMax) {
-		float oldRange = oldMax - oldMin;
-		float newRange = newMax - newMin;
-	
-		return (value / oldRange) * newRange + newMin;
+	public float Fitness() {
+		return lastAccuracy * completedTiles;
 	}
 }
