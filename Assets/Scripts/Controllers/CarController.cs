@@ -6,12 +6,18 @@ public class CarController : MonoBehaviour {
 
 	public int carCount = 2;
 	public GameObject carPrefab;
-	private static List<GameObject> cars;
 
+	private static List<GameObject> cars;
+	private List<Tile> spawnpoints;
 	void Start() {
+		spawnpoints = TileController.GetSpawnpoints();
+		
 		CarController.cars = new List<GameObject>();
 		for (int i = 0; i < carCount; i++) {
-			var car = Instantiate(carPrefab, new Vector3(0, 3, 0), Quaternion.identity);
+			Tile currSpawnpoint = spawnpoints[i % spawnpoints.Count];
+			GameObject car = Instantiate(carPrefab, currSpawnpoint.GetWorldPos(), Quaternion.identity);
+			car.GetComponent<CarMovement>().SetSpawnpoint(currSpawnpoint);
+
 			CarController.cars.Add(car);
 			List<Collider> colls = car.GetComponent<CarMovement>().GetColliders();
 			

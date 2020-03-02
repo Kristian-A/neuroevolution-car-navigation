@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class PathFinding : MonoBehaviour { 
-
+public class PathFinding : MonoBehaviour {
+	
 	public static List<Tile> FindPath(Tile startTile, Tile endTile) {
 		List<Tile> openSet = new List<Tile>();
 		HashSet<Tile> closedSet = new HashSet<Tile>();

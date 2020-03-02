@@ -25,8 +25,10 @@ public class CarMovement : MonoBehaviour {
 	public float maxSteer = 40;
 	public float motorForce = 50;
 	public List<GameObject> sensors;
+
 	private NeuralNetwork brain;
 	private List<Tile> path;
+	private Tile spawnpoint;
 	private Tile currentTile;
 	private int completedTiles = 0;
 	private float accSum = 0;
@@ -82,16 +84,15 @@ public class CarMovement : MonoBehaviour {
 		if (keyboardControl) {
 			Steer(Input.GetAxis("Horizontal"));
 			Accelerate(Input.GetAxis("Vertical"));
-
-			
-
 		} else {			
 			Matrix outputs = Think();
 
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));		
 		}
-
+		
+		Think();
+		UpdatePath();
 		UpdateAccuracy();
 		RotateAxles();
 	}
@@ -103,14 +104,6 @@ public class CarMovement : MonoBehaviour {
 			inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
 		}
 
-		if (path == null) {
-			path = TileController.GetPath();
-		}
-
-		if (path != null && currentTile == null) {
-			SetNextTile();
-		} 
-
 		if (currentTile != null) {
 			Vector3 carPos = transform.position;
 			Vector3 distance = currentTile.GetWorldPos() - carPos;
@@ -120,18 +113,28 @@ public class CarMovement : MonoBehaviour {
 			
 			if (distance.magnitude < 1) {
 				SetNextTile();	
-				completedTiles += 1;
 			}
 		}
 		
 		return brain.FeedForward(inputs);
 	}
 
+	private void UpdatePath() {
+		if (path != null) {
+			TileController.Reset(path);
+		}
+
+		path = TileController.GetPath(spawnpoint);
+
+		if (currentTile == null) {
+			SetNextTile();
+		} 
+	}
 	private void SetNextTile() {
 		if (path.Count == completedTiles) {
 			return;
 		}
-		currentTile = path[completedTiles];
+		currentTile = path[completedTiles++];
 	}
 
 	public List<Collider> GetColliders() {
@@ -178,9 +181,13 @@ public class CarMovement : MonoBehaviour {
 		return lastAccuracy;
 	}
 
+	public void SetSpawnpoint(Tile tile) {
+		spawnpoint = tile;
+	}
+
 	private bool IsOnPath() {
 		foreach (GameObject obj in collidingTiles) {
-			if (obj.GetComponent<Tile>().IsPath()) {
+			if (path.Contains(obj.GetComponent<Tile>())) {
 				return true;
 			}
 		}
@@ -188,6 +195,6 @@ public class CarMovement : MonoBehaviour {
 	}
 
 	public float Fitness() {
-		return lastAccuracy * completedTiles;
+		return lastAccuracy * completedTiles * GetComponent<Rigidbody>().velocity.magnitude;
 	}
 }

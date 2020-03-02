@@ -15,16 +15,22 @@ public class Tile : MonoBehaviour {
 	private Tile previous;
 
 	private bool isPath = false;
+	private bool isSpawnpoint = false;
+	private bool isEnd = false;
 
 	public void Awake() {
 		material = GetComponent<Renderer>().material;
 	}
 
 	public void Update() {
-		if (isPath) {
-			SetColor(new Color(0, 0, 1, alpha));
+		if (isEnd) {
+			SetColor(new Color(0, 1, 1, alpha));			
 		} else if (isWall) {
 			SetColor(new Color(1, 0, 0, alpha));
+		} else if (isSpawnpoint) {
+			SetColor(new Color(0, 1, 0, alpha));
+		} else if (isPath) {
+			SetColor(new Color(0, 0, 1, alpha));
 		} else {
 			SetColor(new Color(1, 1, 1, alpha));			
 		}
@@ -43,6 +49,14 @@ public class Tile : MonoBehaviour {
 	}
 	public Vector3 GetWorldPos() {
 		return worldPos;
+	}
+
+	public void SetSpawnpoint() {
+		isSpawnpoint = true;
+	}
+
+	public void SetEnd() {
+		isEnd = true;
 	}
 
 	public int Fcost() {
