@@ -26,6 +26,7 @@ class GeneticAlgorithm {
     }
 
     private static Random generator = new Random();
+    
     public static List<double>[] Crossover(List<double> dna1, List<double> dna2) {
         List<double> child1 = new List<double>();
         List<double> child2 = new List<double>();

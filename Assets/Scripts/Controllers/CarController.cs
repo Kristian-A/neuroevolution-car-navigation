@@ -7,36 +7,47 @@ public class CarController : MonoBehaviour {
 	public int carCount = 2;
 	public GameObject carPrefab;
 
-	private static List<GameObject> cars;
+	private static List<CarMovement> cars;
 	private List<Tile> spawnpoints;
+	private static Timer restartTimer = new Timer(5000);
+	private static bool generationDone = false;
 	void Start() {
 		spawnpoints = TileController.GetSpawnpoints();
 		
-		CarController.cars = new List<GameObject>();
+		CarController.cars = new List<CarMovement>();
 		for (int i = 0; i < carCount; i++) {
 			Tile currSpawnpoint = spawnpoints[i % spawnpoints.Count];
-			GameObject car = Instantiate(carPrefab, currSpawnpoint.GetWorldPos(), Quaternion.identity);
+			GameObject carObject = Instantiate(carPrefab, currSpawnpoint.GetWorldPos(), Quaternion.identity);
+			CarMovement car = carObject.GetComponent<CarMovement>();
 			car.GetComponent<CarMovement>().SetSpawnpoint(currSpawnpoint);
 
 			CarController.cars.Add(car);
-			List<Collider> colls = car.GetComponent<CarMovement>().GetColliders();
+			List<Collider> colls = car.GetColliders();
 			
-			foreach (GameObject other in CarController.cars) {
+			foreach (CarMovement other in CarController.cars) {
 				if (car == other) {
 					continue;
 				}
-				DisableCollisions(colls, other.GetComponent<CarMovement>().GetColliders());
+				DisableCollisions(colls, other.GetColliders());
 			}
 		}
 	}
 
-	void FixedUpdate() {
-		foreach (GameObject car in CarController.cars) {
-			// print(car.GetComponent<CarMovement>().GetCompletedTiles());
+	void Update() {
+		if (CarController.restartTimer.IsElapsed()) {
+			CarController.generationDone = true;
 		}
 	}
 	
-	public static List<GameObject> GetCars() {
+	public static bool GenerationDone() {
+		bool ret = CarController.generationDone;
+		if (CarController.generationDone) {
+			CarController.generationDone = false;
+		}
+		return ret;
+	}
+
+	public static List<CarMovement> GetCars() {
 		return cars;
 	}
 

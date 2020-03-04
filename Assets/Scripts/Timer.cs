@@ -1,10 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+
 class Timer {
     private Stopwatch stopwatch = new Stopwatch();
     private int resetTime;
-    private int prevTime;
+    private long prevTime;
 
     public Timer(int resetTime) {
         this.resetTime = resetTime;
@@ -12,7 +13,7 @@ class Timer {
     }
 
     public bool IsElapsed() {
-        int currTime = CurrentTime(); 
+        long currTime = CurrentTime(); 
         if (currTime - prevTime >= resetTime) {
             prevTime = currTime;
             return true;
@@ -20,8 +21,11 @@ class Timer {
         return false;
     }
 
-    private int CurrentTime() {
-        return stopwatch.Elapsed.Seconds * 1000 + stopwatch.Elapsed.Milliseconds; 
+    private long CurrentTime() {
+        return ( (stopwatch.Elapsed.Hours * 1000 + 
+                stopwatch.Elapsed.Minutes) * 1000 +
+            stopwatch.Elapsed.Seconds) * 1000 +
+            stopwatch.Elapsed.Milliseconds; 
     }
 
     public void Reset() {
