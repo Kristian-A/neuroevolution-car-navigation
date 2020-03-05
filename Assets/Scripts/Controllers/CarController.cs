@@ -9,7 +9,7 @@ public class CarController : MonoBehaviour {
 
 	private static List<CarMovement> cars;
 	private List<Tile> spawnpoints;
-	private static Timer restartTimer = new Timer(5000);
+	private static Timer restartTimer = new Timer(7000);
 	private static bool generationDone = false;
 	void Start() {
 		spawnpoints = TileController.GetSpawnpoints();

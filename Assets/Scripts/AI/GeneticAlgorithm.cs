@@ -71,7 +71,11 @@ class GeneticAlgorithm {
         }
 
         double previousProb = 0; 
- 
+
+        entries.Sort((Entry a, Entry b) => {
+            return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
+        });
+
         foreach (Entry entry in entries) {
             double currentProb = entry.GetProbability(sumFitness); 
 

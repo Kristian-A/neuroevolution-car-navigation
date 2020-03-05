@@ -5,7 +5,7 @@ using UnityEngine;
 public class AIController : MonoBehaviour {
 
 	private List<CarMovement> cars;
-	private int[] nnSize = new int[] {8, 15, 12};
+	private int[] nnSize = new int[] {8, 30, 2};
 
     public void Start() {
 
@@ -18,6 +18,7 @@ public class AIController : MonoBehaviour {
 	public void Update() {
 		if (CarController.GenerationDone()) {
 			double maxFitness = 0;
+			double sumFitness = 0;
 			var entries = new List<GeneticAlgorithm.Entry>(); 
 			foreach (CarMovement car in cars) {
 				var dna = car.GetBrain().DNA();
@@ -27,9 +28,12 @@ public class AIController : MonoBehaviour {
 				if (maxFitness < fitness) {
 					maxFitness = fitness;
 				}
+
+				sumFitness += fitness;
 			}
 
-			print(maxFitness);
+			print("Max:" + maxFitness);
+			print("Average:" + sumFitness/entries.Count);
 
 			var DNAs = NextGeneration(entries);
 
@@ -45,7 +49,8 @@ public class AIController : MonoBehaviour {
 		int half = cars.Count / 2;
 		var pool = new List<List<double>>(); 
 		for (int i = 0; i < half; i++) {
-			pool.Add(GeneticAlgorithm.Pick(entries).GetDna());
+			var entry = GeneticAlgorithm.Pick(entries);
+			pool.Add(entry.GetDna());
 		}
 
 		for (int i = 0; i < half/2; i++) {

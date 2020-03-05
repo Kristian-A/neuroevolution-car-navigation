@@ -25,7 +25,6 @@ public class CarMovement : MonoBehaviour {
 	public float maxSteer = 40;
 	public float motorForce = 50;
 	public List<GameObject> sensors;
-
 	private NeuralNetwork brain;
 	private List<Tile> path;
 	private Tile spawnpoint;
@@ -36,8 +35,11 @@ public class CarMovement : MonoBehaviour {
 	private float lastAccuracy = 0;
 	private float avgVel = 0;
 	private int avgVelCount = 0;
-	private float lastAverageVelocity = 0; 
-	private int punishment = 0;
+	private float lastAverageVelocity = 0;
+	private float lastDistanceFromRoad = 0;
+	private int distFromRoadCount = 0;
+	private float minDistFromEnd = 10000; 
+	private int punishment = 1;
 	private List<GameObject> collidingTiles = new List<GameObject>(); 
 	private Timer tileTimer = new Timer(195);
 	private Timer accuracyTimer = new Timer(200);
@@ -103,7 +105,6 @@ public class CarMovement : MonoBehaviour {
 			Accelerate(Input.GetAxis("Vertical"));
 		} else if (!paused) {			
 			Matrix outputs = Think();
-
 			Steer((float)outputs.Get(0, 0));
 			Accelerate((float)outputs.Get(1, 0));		
 		}
@@ -111,7 +112,9 @@ public class CarMovement : MonoBehaviour {
 		UpdatePath();
 		UpdateAccuracy();
 		RotateAxles();
+		UpdateDistanceFromEnd();
 
+		// print(punishment);
 		// print(Score());
 		// print(paused);
 	}
@@ -179,13 +182,20 @@ public class CarMovement : MonoBehaviour {
 				currentAcc = 1f/(int)smallestDiff;
 			}
 
-			accSum += IsOnPath() ? currentAcc : -0.1f;	
+			if (IsOnPath()) {
+				accSum += currentAcc;
+				UpdateAverageVelocity();
+			}
+
+			lastDistanceFromRoad += DistanceFromRoad();
+			distFromRoadCount++;
+
+			// print(lastDistanceFromRoad);
+
 			accSumCount++;
 
 			collidingTiles = new List<GameObject>();
 			tileTimer.Reset();
-
-			UpdateAverageVelocity();
 		}
 
 		lastAccuracy = accSumCount != 0 ? accSum/accSumCount : 0;
@@ -196,6 +206,14 @@ public class CarMovement : MonoBehaviour {
 	private void UpdateAverageVelocity() {
 		avgVel += GetVelocity().magnitude;
 		lastAverageVelocity = avgVel/++avgVelCount;
+	}
+
+	private void UpdateDistanceFromEnd() {
+		var dist = (transform.position - path[path.Count-1].GetWorldPos()).magnitude;
+		
+		if (minDistFromEnd > dist) {
+			minDistFromEnd = dist;
+		}
 	}
 
 	public List<Collider> GetColliders() {
@@ -225,6 +243,9 @@ public class CarMovement : MonoBehaviour {
 		avgVel = 0;
 		avgVelCount = 0;
 		lastAverageVelocity = 0;
+		minDistFromEnd = float.MaxValue;
+		lastDistanceFromRoad = 0;
+		distFromRoadCount = 0;
 	}
 
 	public void SetSpawnpoint(Tile tile) {
@@ -240,6 +261,18 @@ public class CarMovement : MonoBehaviour {
 		return false;
 	}
 
+	private float DistanceFromRoad() {
+		float minDistance = float.MaxValue;
+		foreach (Tile tile in path) {
+			float currDist = (transform.position - tile.GetWorldPos()).magnitude;
+		
+			if (minDistance > currDist) {
+				minDistance = currDist;
+			}
+		}
+		return minDistance;
+	}
+
 	private Vector3 GetVelocity() {
 		return GetComponent<Rigidbody>().velocity;
 	}
@@ -253,6 +286,7 @@ public class CarMovement : MonoBehaviour {
 	}
 
 	public float Score() {
-		return lastAccuracy + completedTiles * 3 + lastAverageVelocity - punishment * 3 + 1;
+		var avgDist = lastDistanceFromRoad / distFromRoadCount;
+		return ((5/minDistFromEnd + 1/avgDist) + 0.1f) / (punishment/2f);
 	}
 }
