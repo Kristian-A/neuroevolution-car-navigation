@@ -25,37 +25,24 @@ public class CarMovement : MonoBehaviour {
 	public float maxSteer = 40;
 	public float motorForce = 50;
 	public List<GameObject> sensors;
+	// ---------------------- Unity shits -----------------------
 	private NeuralNetwork brain;
-	private List<Tile> path;
+	// private List<Tile> path;
 	private Tile spawnpoint;
-	private Tile currentTile;
-	private int completedTiles = 0;
-	private float accSum = 0;
-	private int accSumCount = 0;
-	private float lastAccuracy = 0;
-	private float avgVel = 0;
-	private int avgVelCount = 0;
-	private float lastAverageVelocity = 0;
-	private float lastDistanceFromRoad = 0;
-	private int distFromRoadCount = 0;
-	private float minDistFromEnd = 10000; 
 	private int punishment = 1;
-	private List<GameObject> collidingTiles = new List<GameObject>(); 
+	private Average avgSpeed = new Average();
+	private Average avgRoadDist = new Average();
+	private Average avgCheckpointDist = new Average();
+	private int completedCheckpoints = 0;
 	private Timer tileTimer = new Timer(195);
 	private Timer accuracyTimer = new Timer(200);
 	private bool paused = false;
-
-	public void OnTriggerStay(Collider other) {
-		if (other.tag == "Tile" && !collidingTiles.Contains(other.gameObject)) {
-			collidingTiles.Add(other.gameObject);
-		}  
-	} 
 
 	public void OnTriggerEnter(Collider other) {
 		if (!CollisionController.IsIgnored(other.tag)) {
 			punishment++;
 		}
-	}
+	} // TODO: make a map that works with collisions
 
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;	
@@ -109,114 +96,60 @@ public class CarMovement : MonoBehaviour {
 			Accelerate((float)outputs.Get(1, 0));		
 		}
 
-		UpdatePath();
+		Think();
 		UpdateAccuracy();
 		RotateAxles();
-		UpdateDistanceFromEnd();
-
-		// print(punishment);
-		// print(Score());
-		// print(paused);
 	}
 
 	private Matrix Think() {
-		Matrix inputs = new Matrix(8, 1);
+		Matrix inputs = new Matrix(AIController.nnSize[0], 1);
 		
 		for (int i = 0; i < 6; i++) {
 			inputs.Set(i, 0, sensors[i].GetComponent<Sensor>().GetDistance());
 		}
 
-		if (currentTile != null) {
-			Vector3 carPos = transform.position;
-			Vector3 distance = currentTile.GetWorldPos() - carPos;
-			
-			inputs.Set(6, 0, distance.x);
-			inputs.Set(7, 0, distance.z);
-			
-			if (distance.magnitude < 1) {
-				SetNextTile();	
-			}
-		}
-		
+		inputs.Set(6, 0, DistanceFromCheckpoint());
+		inputs.Set(7, 0, DistanceFromRoad());
+
 		return brain.FeedForward(inputs);
 	}
 
-	private void SetNextTile() {
-		if (path.Count == completedTiles) {
-			return;
-		}
-		currentTile = path[completedTiles++];
-	}
-	
-	private void UpdatePath() {
-		if (path != null) {
-			TileController.Reset(path);
-		}
+	private List<Tile> GetCheckpoints() {
+		var checkpoints = new List<Tile>();
+		var path = TileController.GetPath(spawnpoint);
+		Vector2 prevDiff = path[1].GetPos() - path[0].GetPos();
 
-		path = TileController.GetPath(spawnpoint);
-		path.Insert(0, spawnpoint);
+		int lastCheckpoint = 2;
 
-		if (currentTile == null) {
-			SetNextTile();
-		} 
-	}
+		for (int i = 2; i < path.Count; i++) {
+			var currDiff = path[i].GetPos() - path[i-1].GetPos();
+			if (prevDiff != currDiff || lastCheckpoint > 2 || i == path.Count-1) {
+				path[i-1].SetCheckpoint();
+				checkpoints.Add(path[i]);
 
-	private float UpdateAccuracy() {		
-		if (accuracyTimer.IsElapsed()) {
-			float rot = (float)transform.rotation.eulerAngles.y;
+				lastCheckpoint = 0;
+			}	
 			
-			int smallestDiff = 45;
+			lastCheckpoint++;
+			
+			prevDiff = currDiff;
+		}
 
-			for (int degrees = 0; degrees < 360; degrees += 45) {
-				int diff = (int)Mathf.Abs(rot - degrees);
+		return checkpoints;
+	}
 
-				if (diff < smallestDiff) {
-					smallestDiff = diff;
-				}
-			}
+	private void UpdateAccuracy() {		
+		if (accuracyTimer.IsElapsed()) {
 
-			float currentAcc;
-			if ((int)smallestDiff == 0) {
-				currentAcc = 1;
-			} else {
-				currentAcc = 1f/(int)smallestDiff;
-			}
+			avgRoadDist.Add(DistanceFromRoad());
+			avgSpeed.Add(GetVelocity().magnitude);
+			avgCheckpointDist.Add(DistanceFromCheckpoint());
 
-			if (IsOnPath()) {
-				accSum += currentAcc;
-				UpdateAverageVelocity();
-			}
-
-			lastDistanceFromRoad += DistanceFromRoad();
-			distFromRoadCount++;
-
-			// print(lastDistanceFromRoad);
-
-			accSumCount++;
-
-			collidingTiles = new List<GameObject>();
 			tileTimer.Reset();
 		}
-
-		lastAccuracy = accSumCount != 0 ? accSum/accSumCount : 0;
-
-		return lastAccuracy;
 	}
 
-	private void UpdateAverageVelocity() {
-		avgVel += GetVelocity().magnitude;
-		lastAverageVelocity = avgVel/++avgVelCount;
-	}
-
-	private void UpdateDistanceFromEnd() {
-		var dist = (transform.position - path[path.Count-1].GetWorldPos()).magnitude;
-		
-		if (minDistFromEnd > dist) {
-			minDistFromEnd = dist;
-		}
-	}
-
-	public List<Collider> GetColliders() {
+	public List<Collider> GetColliders() { 
 		List<Collider> colliders = new List<Collider>();
 		colliders.Add(GetComponent<Collider>());
 		foreach (Axle axle in axles) {
@@ -235,33 +168,18 @@ public class CarMovement : MonoBehaviour {
 		ClearVelocity();
 		transform.position = spawnpoint.GetWorldPos();
 		transform.rotation = Quaternion.identity;
-
-		completedTiles = 0;
-		accSum = 0;
-		accSumCount = 0;
-		lastAccuracy = 0;
-		avgVel = 0;
-		avgVelCount = 0;
-		lastAverageVelocity = 0;
-		minDistFromEnd = float.MaxValue;
-		lastDistanceFromRoad = 0;
-		distFromRoadCount = 0;
+		avgRoadDist.Reset();
+		avgCheckpointDist.Reset();
+		avgSpeed.Reset();
+		completedCheckpoints = 0;
 	}
 
 	public void SetSpawnpoint(Tile tile) {
 		spawnpoint = tile;
 	}
-
-	private bool IsOnPath() {
-		foreach (GameObject obj in collidingTiles) {
-			if (path.Contains(obj.GetComponent<Tile>())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+	
 	private float DistanceFromRoad() {
+		var path = TileController.GetPath(spawnpoint);
 		float minDistance = float.MaxValue;
 		foreach (Tile tile in path) {
 			float currDist = (transform.position - tile.GetWorldPos()).magnitude;
@@ -273,6 +191,18 @@ public class CarMovement : MonoBehaviour {
 		return minDistance;
 	}
 
+	private float DistanceFromCheckpoint() {
+		var checkpoints = GetCheckpoints(); 
+		var checkpoint = checkpoints[completedCheckpoints];
+		var distance = (transform.position - checkpoint.GetWorldPos()).magnitude;
+
+		if (distance < 2 && completedCheckpoints < checkpoints.Count-1) {
+			completedCheckpoints++;
+		}
+
+		return distance;
+	}
+
 	private Vector3 GetVelocity() {
 		return GetComponent<Rigidbody>().velocity;
 	}
@@ -281,12 +211,14 @@ public class CarMovement : MonoBehaviour {
 		var rigidbody = GetComponent<Rigidbody>();
 		rigidbody.velocity = Vector3.zero;
 		rigidbody.angularVelocity = Vector3.zero;
-
 		rigidbody.Sleep();
 	}
 
 	public float Score() {
-		var avgDist = lastDistanceFromRoad / distFromRoadCount;
-		return ((5/minDistFromEnd + 1/avgDist) + 0.1f) / (punishment/2f);
+		var roadDistF = 1/(float)avgRoadDist.Get();
+		var checkpointDistF = 1/(float)avgCheckpointDist.Get();
+		var speedF = (float)avgSpeed.Get();
+	
+		return roadDistF * checkpointDistF * speedF + 0.1f;
 	}
 }

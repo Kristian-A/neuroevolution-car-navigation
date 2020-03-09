@@ -17,23 +17,19 @@ public class Tile : MonoBehaviour {
 	private bool isPath = false;
 	private bool isSpawnpoint = false;
 	private bool isEnd = false;
+	private bool isCheckpoint = false;
 
 	public void Awake() {
 		material = GetComponent<Renderer>().material;
 	}
 
 	public void Update() {
-		if (isEnd) {
-			SetColor(new Color(0, 1, 1, alpha));			
-		} else if (isWall) {
-			SetColor(new Color(1, 0, 0, alpha));
-		} else if (isSpawnpoint) {
-			SetColor(new Color(0, 1, 0, alpha));
-		} else if (isPath) {
-			SetColor(new Color(0, 0, 1, alpha));
-		} else {
-			SetColor(new Color(1, 1, 1, alpha));			
-		}
+		if 		(isWall) 		SetColor(new Color(1, 0, 0, alpha));
+		else if (isEnd) 		SetColor(new Color(0, 1, 1, alpha));
+		else if (isCheckpoint) 	SetColor(new Color(1, 1, 0, alpha));
+		else if (isSpawnpoint) 	SetColor(new Color(0, 1, 0, alpha)); 
+		else if (isPath) 		SetColor(new Color(0, 0, 1, alpha));
+		else 					SetColor(new Color(1, 1, 1, alpha));
 	}
 
 	public void SetPos(Vector2 pos) {
@@ -57,6 +53,18 @@ public class Tile : MonoBehaviour {
 
 	public void SetEnd() {
 		isEnd = true;
+	}
+
+	public void SetPath() {
+		isPath = true;
+	}
+
+	public bool IsPath() {
+		return isPath;
+	}
+
+	public void SetCheckpoint() {
+		isCheckpoint = true;
 	}
 
 	public int Fcost() {
@@ -87,19 +95,12 @@ public class Tile : MonoBehaviour {
 		return isWall;
 	}
 
-	public void SetPath() {
-		isPath = true;
-	}
-
-	public bool IsPath() {
-		return isPath;
-	}
-
 	public void Reset() {
 		gCost = 0;
 		hCost = 0;
 		previous = null;
-		isPath = false;		
+		isPath = false;
+		// isCheckpoint = false;		
 	}
 
 	public void OnTriggerStay(Collider other) {

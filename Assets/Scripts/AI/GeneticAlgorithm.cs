@@ -49,7 +49,7 @@ class GeneticAlgorithm {
     }   
 
     private static List<Double> Mutate(List<Double> dna) {
-        const double mutationRate = 0.001;
+        const double mutationRate = 0.01;
 
         if (generator.NextDouble() < mutationRate) {
             int toSwap1 = generator.Next(dna.Count);

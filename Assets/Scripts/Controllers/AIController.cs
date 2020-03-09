@@ -5,20 +5,21 @@ using UnityEngine;
 public class AIController : MonoBehaviour {
 
 	private List<CarMovement> cars;
-	private int[] nnSize = new int[] {8, 30, 2};
+	public static int[] nnSize = new int[] {8, 30, 2};
 
     public void Start() {
 
 		cars = CarController.GetCars();
-		foreach (CarMovement car in cars) {		    
+		foreach (CarMovement car in cars) {	
+			var nnSize = AIController.nnSize; 	    
 			car.SetBrain(new NeuralNetwork(nnSize[0], nnSize[1], nnSize[2]));
 		}
 	}
 
 	public void Update() {
+		Average avgFitness = new Average();
 		if (CarController.GenerationDone()) {
 			double maxFitness = 0;
-			double sumFitness = 0;
 			var entries = new List<GeneticAlgorithm.Entry>(); 
 			foreach (CarMovement car in cars) {
 				var dna = car.GetBrain().DNA();
@@ -29,11 +30,11 @@ public class AIController : MonoBehaviour {
 					maxFitness = fitness;
 				}
 
-				sumFitness += fitness;
+				avgFitness.Add(fitness);
 			}
 
 			print("Max:" + maxFitness);
-			print("Average:" + sumFitness/entries.Count);
+			print("Average:" + avgFitness.Get());
 
 			var DNAs = NextGeneration(entries);
 
@@ -62,7 +63,7 @@ public class AIController : MonoBehaviour {
 			pool.Add(children[1]);
 		}
 
-		return pool;
+		return Shuffle(pool);
 	}
 
 	private List<T> Shuffle<T>(List<T> l) {
