@@ -33,6 +33,7 @@ public class CarMovement : MonoBehaviour {
 	private Average avgSpeed = new Average();
 	private Average avgRoadDist = new Average();
 	private Average avgCheckpointDist = new Average();
+	private Average avgSpawnpointDist = new Average();
 	private int completedCheckpoints = 0;
 	private Timer tileTimer = new Timer(195);
 	private Timer accuracyTimer = new Timer(200);
@@ -144,6 +145,7 @@ public class CarMovement : MonoBehaviour {
 			avgRoadDist.Add(DistanceFromRoad());
 			avgSpeed.Add(GetVelocity().magnitude);
 			avgCheckpointDist.Add(DistanceFromCheckpoint());
+			avgSpawnpointDist.Add(DistanceFromStart());
 
 			tileTimer.Reset();
 		}
@@ -171,6 +173,7 @@ public class CarMovement : MonoBehaviour {
 		avgRoadDist.Reset();
 		avgCheckpointDist.Reset();
 		avgSpeed.Reset();
+		avgSpawnpointDist.Reset();
 		completedCheckpoints = 0;
 	}
 
@@ -203,6 +206,10 @@ public class CarMovement : MonoBehaviour {
 		return distance;
 	}
 
+	private float DistanceFromStart() {
+		return  (transform.position - spawnpoint.GetWorldPos()).magnitude;
+	}
+
 	private Vector3 GetVelocity() {
 		return GetComponent<Rigidbody>().velocity;
 	}
@@ -215,10 +222,10 @@ public class CarMovement : MonoBehaviour {
 	}
 
 	public float Score() {
-		var roadDistF = 1/(float)avgRoadDist.Get();
-		var checkpointDistF = 1/(float)avgCheckpointDist.Get();
-		var speedF = (float)avgSpeed.Get();
+		var roadDistF = 1/avgRoadDist.Get();
+		var checkpointDistF = 1/avgCheckpointDist.Get();
+		var speedF = avgSpeed.Get();
 	
-		return roadDistF * checkpointDistF * speedF + 0.1f;
+		return roadDistF + checkpointDistF + speedF + avgSpawnpointDist.Get() + 0.1f;
 	}
 }

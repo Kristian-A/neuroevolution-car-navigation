@@ -100,7 +100,7 @@ public class Tile : MonoBehaviour {
 		hCost = 0;
 		previous = null;
 		isPath = false;
-		// isCheckpoint = false;		
+		isCheckpoint = false;		
 	}
 
 	public void OnTriggerStay(Collider other) {

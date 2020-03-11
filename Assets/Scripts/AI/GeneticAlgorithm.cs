@@ -25,7 +25,7 @@ class GeneticAlgorithm {
         }
     }
 
-    private static Random generator = new Random();
+    private static Random generator = new Random(0);
     
     public static List<double>[] Crossover(List<double> dna1, List<double> dna2) {
         List<double> child1 = new List<double>();
@@ -72,10 +72,6 @@ class GeneticAlgorithm {
 
         double previousProb = 0; 
 
-        entries.Sort((Entry a, Entry b) => {
-            return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
-        });
-
         foreach (Entry entry in entries) {
             double currentProb = entry.GetProbability(sumFitness); 
 
@@ -86,5 +82,9 @@ class GeneticAlgorithm {
         }
 
         return null;
+    }
+
+    public void Seed(int seed) {
+        generator = new Random(seed);
     }
 }

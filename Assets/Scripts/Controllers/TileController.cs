@@ -59,8 +59,8 @@ public class TileController : MonoBehaviour {
 		return tile;
 	}
 
-	public static void Reset(List<Tile> tiles) {
-		foreach (Tile tile in tiles) {
+	public static void Reset() {
+		foreach (Tile tile in tileMap) {
 			tile.Reset();
 		}
 	}

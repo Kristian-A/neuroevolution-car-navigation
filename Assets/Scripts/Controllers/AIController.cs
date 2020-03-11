@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,9 +48,19 @@ public class AIController : MonoBehaviour {
 	}
 
 	List<List<double>> NextGeneration(List<GeneticAlgorithm.Entry> entries) {
+		entries.Sort((GeneticAlgorithm.Entry a, GeneticAlgorithm.Entry b) => {
+            return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
+        });
+		
 		int half = cars.Count / 2;
-		var pool = new List<List<double>>(); 
-		for (int i = 0; i < half; i++) {
+		var pool = new List<List<double>>();
+		int topCount = 5;
+
+		for (int i = 0; i < topCount; i++) {
+			pool.Add(entries[i].GetDna());
+		}
+
+		for (int i = 0; i < half - topCount; i++) {
 			var entry = GeneticAlgorithm.Pick(entries);
 			pool.Add(entry.GetDna());
 		}
@@ -70,7 +81,7 @@ public class AIController : MonoBehaviour {
 		for (int j = 0; j < 100; j++) {
 			for (int i = 0; i < l.Count; i++) {
 				T temp = l[i];
-				int randomIndex = Random.Range(i, l.Count);
+				int randomIndex = UnityEngine.Random.Range(i, l.Count);
 				l[i] = l[randomIndex];
 				l[randomIndex] = temp;
 			}

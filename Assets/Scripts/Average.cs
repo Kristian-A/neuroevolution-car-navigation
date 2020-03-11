@@ -1,13 +1,13 @@
 class Average {
 
-    private double sum = 0;
+    private float sum = 0;
     private int count = 0;
-    public void Add(double num) {
+    public void Add(float num) {
         sum += num;
         count++;
     } 
 
-    public double Get() {
+    public float Get() {
         if (count == 0) {
             return 0;
         }
