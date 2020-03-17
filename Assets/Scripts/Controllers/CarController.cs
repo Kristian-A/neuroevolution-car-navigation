@@ -6,11 +6,13 @@ public class CarController : MonoBehaviour {
 
 	public int carCount = 2;
 	public GameObject carPrefab;
+	private static bool demonstrating = false;
 
 	private static List<CarMovement> cars;
 	private List<Tile> spawnpoints;
-	private static Timer restartTimer = new Timer(25000);
+	private static Timer restartTimer = new Timer(40000);
 	private static bool generationDone = false;
+	
 	void Start() {
 		spawnpoints = TileController.GetSpawnpoints();
 		
@@ -34,7 +36,11 @@ public class CarController : MonoBehaviour {
 	}
 
 	void Update() {
-		if (CarController.restartTimer.IsElapsed()) {
+		if (CarController.demonstrating) {
+			return;
+		} 
+		
+		if (CarController.restartTimer.IsElapsed()) {	
 			CarController.generationDone = true;
 			TileController.Reset();
 		}
@@ -58,5 +64,25 @@ public class CarController : MonoBehaviour {
 				Physics.IgnoreCollision(fCol, sCol);
 			}
 		}
+	}
+
+	public static void Demonstrate(List<double> DNA) {
+		foreach (var car in cars) {
+			car.gameObject.SetActive(false);
+		}
+
+		var simCar = cars[0];
+
+		simCar.Reset();
+
+		var nnWeights = AIController.nnSize;
+		var brain = new NeuralNetwork(nnWeights[0], nnWeights[1], nnWeights[2]);
+
+		brain.SetWeights(DNA);
+
+		simCar.SetBrain(brain);
+		simCar.gameObject.SetActive(true);
+
+		demonstrating = true;
 	}
 }

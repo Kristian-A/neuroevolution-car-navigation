@@ -14,7 +14,8 @@ public class PathFinding : MonoBehaviour {
 		while (openSet.Count > 0) {
 			Tile currentTile = openSet[0];
 			for (int i = 1; i < openSet.Count; i++) {
-				if (openSet[i].Fcost() < currentTile.Fcost() || openSet[i].Fcost() == currentTile.Fcost() && openSet[i].Hcost() < currentTile.Hcost() ) {
+				if (openSet[i].Fcost() < currentTile.Fcost() || openSet[i].Fcost() == currentTile.Fcost() &&
+					openSet[i].Hcost() < currentTile.Hcost() ) {
 					currentTile = openSet[i];
 				}
 			}

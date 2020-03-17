@@ -17,6 +17,7 @@ public class Matrix {
     public void Set(int x, int y, double value) {
         numbers[y, x] = value;
     }
+
     public double Get(int x, int y) {
         return numbers[y, x];
     }
@@ -50,6 +51,7 @@ public class Matrix {
             }
         }
     }
+
     public int GetWidth() {
         return width;
     }
@@ -57,9 +59,10 @@ public class Matrix {
     public int GetHeight() {
         return height;
     }
+
     public static Matrix operator* (Matrix a, Matrix b) {
         if (a.width != b.height) {
-            return new Matrix(1, 1);
+            return null;
         }
         Matrix res = new Matrix(b.width, a.height);
         b = b.Transpolate();

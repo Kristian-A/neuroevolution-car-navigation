@@ -30,7 +30,8 @@ public class TileController : MonoBehaviour {
 
 		for (int z = 0; z < tileCountZ; z++) {
 			for (int x = 0; x < tileCountX; x++) {
-				GameObject tileObject = Instantiate(tilePrefab, startPos + new Vector3(x * tileScale * xDir, 0, z * tileScale * zDir), Quaternion.identity);
+				var nextPos = new Vector3(x * tileScale * xDir, 0, z * tileScale * zDir);
+				GameObject tileObject = Instantiate(tilePrefab, startPos + nextPos, Quaternion.identity);
 				Tile tile = CreateTile(tileObject, x, z);
 				TileController.tileMap[z, x] = tile;
 			}

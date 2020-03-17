@@ -2,40 +2,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AIController : MonoBehaviour {
 
-	private List<CarMovement> cars;
+	private static List<CarMovement> cars;
+	private static int generationCount = 0;
 	public static int[] nnSize = new int[] {8, 30, 2};
+	public GameObject textfield;
 
     public void Start() {
+		GeneticAlgorithm.Seed(0);
 
 		cars = CarController.GetCars();
 		foreach (CarMovement car in cars) {	
 			var nnSize = AIController.nnSize; 	    
 			car.SetBrain(new NeuralNetwork(nnSize[0], nnSize[1], nnSize[2]));
 		}
+
+		WriteInfo(0, 0, 0);
 	}
 
 	public void Update() {
-		Average avgFitness = new Average();
 		if (CarController.GenerationDone()) {
-			double maxFitness = 0;
-			var entries = new List<GeneticAlgorithm.Entry>(); 
-			foreach (CarMovement car in cars) {
-				var dna = car.GetBrain().DNA();
-				var fitness = car.Score();
-				entries.Add(new GeneticAlgorithm.Entry(dna, fitness));
+
+			Average avgFitness = new Average();
+			var entries = GetEntries(); 
 			
-				if (maxFitness < fitness) {
-					maxFitness = fitness;
-				}
-
-				avgFitness.Add(fitness);
+			foreach (var entry in entries) {
+				avgFitness.Add((float)entry.GetFitness());
 			}
-
-			print("Max:" + maxFitness);
-			print("Average:" + avgFitness.Get());
+			
+			WriteInfo((float)GetBestEntry().GetFitness(), avgFitness.Get(), ++generationCount);
 
 			var DNAs = NextGeneration(entries);
 
@@ -47,7 +45,42 @@ public class AIController : MonoBehaviour {
 		}
 	}
 
-	List<List<double>> NextGeneration(List<GeneticAlgorithm.Entry> entries) {
+	private void WriteInfo(float max, float avg, int generation) {
+		var text = "Max: " + max + "\n" +
+					"Average: " + avg + "\n" +
+					"Generation: " + generation;					
+				
+		textfield.GetComponent<Text>().text = text;
+	}
+
+	private static List<GeneticAlgorithm.Entry> GetEntries() {
+		var entries = new List<GeneticAlgorithm.Entry>();
+
+		foreach (CarMovement car in cars) {
+			var dna = car.GetBrain().DNA();
+			var fitness = car.Score();
+			entries.Add(new GeneticAlgorithm.Entry(dna, fitness));
+		}
+
+		return entries;
+	}
+
+	public static GeneticAlgorithm.Entry GetBestEntry() {
+		var entries = GetEntries();
+
+		var bestEntry = entries[0];
+
+		foreach (var entry in entries) {
+
+			if (entry.GetFitness() > bestEntry.GetFitness()) {
+				bestEntry = entry;
+			}
+		}
+
+		return bestEntry;
+	}
+
+	private static List<List<double>> NextGeneration(List<GeneticAlgorithm.Entry> entries) {
 		entries.Sort((GeneticAlgorithm.Entry a, GeneticAlgorithm.Entry b) => {
             return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
         });
@@ -77,7 +110,7 @@ public class AIController : MonoBehaviour {
 		return Shuffle(pool);
 	}
 
-	private List<T> Shuffle<T>(List<T> l) {
+	private static List<T> Shuffle<T>(List<T> l) {
 		for (int j = 0; j < 100; j++) {
 			for (int i = 0; i < l.Count; i++) {
 				T temp = l[i];
@@ -88,5 +121,9 @@ public class AIController : MonoBehaviour {
 		}
 
 		return l;
+	}
+
+	public static int GenerationCount() {
+		return generationCount;
 	}
 }

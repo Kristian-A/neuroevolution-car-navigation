@@ -25,15 +25,12 @@ public class CarMovement : MonoBehaviour {
 	public float maxSteer = 40;
 	public float motorForce = 50;
 	public List<GameObject> sensors;
-	// ---------------------- Unity shits -----------------------
+	// ---------------------- Unity -----------------------
 	private NeuralNetwork brain;
-	// private List<Tile> path;
 	private Tile spawnpoint;
 	private int punishment = 1;
 	private Average avgSpeed = new Average();
-	private Average avgRoadDist = new Average();
 	private Average avgCheckpointDist = new Average();
-	private Average avgSpawnpointDist = new Average();
 	private int completedCheckpoints = 0;
 	private Timer tileTimer = new Timer(195);
 	private Timer accuracyTimer = new Timer(200);
@@ -43,7 +40,7 @@ public class CarMovement : MonoBehaviour {
 		if (!CollisionController.IsIgnored(other.tag)) {
 			punishment++;
 		}
-	} // TODO: make a map that works with collisions
+	} 
 
 	public void SetBrain(NeuralNetwork brain) {
 		this.brain = brain;	
@@ -124,7 +121,8 @@ public class CarMovement : MonoBehaviour {
 
 		for (int i = 2; i < path.Count; i++) {
 			var currDiff = path[i].GetPos() - path[i-1].GetPos();
-			if (prevDiff != currDiff || lastCheckpoint > 2 || i == path.Count-1) {
+			if (prevDiff != currDiff || lastCheckpoint > 3 || i == path.Count-1) {
+			// if (lastCheckpoint > 3 || i == path.Count-1) {
 				path[i-1].SetCheckpoint();
 				checkpoints.Add(path[i]);
 
@@ -141,11 +139,8 @@ public class CarMovement : MonoBehaviour {
 
 	private void UpdateAccuracy() {		
 		if (accuracyTimer.IsElapsed()) {
-
-			avgRoadDist.Add(DistanceFromRoad());
 			avgSpeed.Add(GetVelocity().magnitude);
 			avgCheckpointDist.Add(DistanceFromCheckpoint());
-			avgSpawnpointDist.Add(DistanceFromStart());
 
 			tileTimer.Reset();
 		}
@@ -170,10 +165,8 @@ public class CarMovement : MonoBehaviour {
 		ClearVelocity();
 		transform.position = spawnpoint.GetWorldPos();
 		transform.rotation = Quaternion.identity;
-		avgRoadDist.Reset();
 		avgCheckpointDist.Reset();
 		avgSpeed.Reset();
-		avgSpawnpointDist.Reset();
 		completedCheckpoints = 0;
 	}
 
@@ -222,10 +215,12 @@ public class CarMovement : MonoBehaviour {
 	}
 
 	public float Score() {
-		var roadDistF = 1/avgRoadDist.Get();
 		var checkpointDistF = 1/avgCheckpointDist.Get();
 		var speedF = avgSpeed.Get();
 	
-		return roadDistF + checkpointDistF + speedF + avgSpawnpointDist.Get() + 0.1f;
+		return checkpointDistF + speedF;
 	}
 }
+
+
+

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-class GeneticAlgorithm {
+public class GeneticAlgorithm {
 
     public class Entry {
 
         private List<Double> dna;
         private double fitness;
+
         public Entry(List<Double> dna, double fitness) {
             this.dna = dna;
             this.fitness = fitness;
@@ -84,7 +85,7 @@ class GeneticAlgorithm {
         return null;
     }
 
-    public void Seed(int seed) {
+    public static void Seed(int seed) {
         generator = new Random(seed);
     }
 }
