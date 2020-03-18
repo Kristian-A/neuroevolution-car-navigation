@@ -6,7 +6,7 @@ public class Sensor : MonoBehaviour {
 
 	public GameObject car;
 	private Material material;
-	private double currentDistance = 10;
+	private double currentDistance = 2;
 	
 	void Awake () {
 		material = GetComponent<Renderer>().material;

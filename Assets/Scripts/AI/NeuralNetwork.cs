@@ -6,6 +6,7 @@ public class NeuralNetwork {
     private Matrix w_ho;
     private Func<double, double> tanh = x => Math.Tanh(x);
     private Func<double, double> LReLU = x => x > 0 ? x : x*0.01;
+    
     public NeuralNetwork(int inputs, int hidden, int outputs) {
         w_ih = new Matrix(hidden, inputs+1);
         w_ih.Randomize();

@@ -87,13 +87,10 @@ public class AIController : MonoBehaviour {
 		
 		int half = cars.Count / 2;
 		var pool = new List<List<double>>();
-		int topCount = 5;
+		
+		pool.Add(GetBestEntry().GetDna());
 
-		for (int i = 0; i < topCount; i++) {
-			pool.Add(entries[i].GetDna());
-		}
-
-		for (int i = 0; i < half - topCount; i++) {
+		for (int i = 0; i < half - 1; i++) {
 			var entry = GeneticAlgorithm.Pick(entries);
 			pool.Add(entry.GetDna());
 		}

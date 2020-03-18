@@ -107,7 +107,7 @@ public class CarMovement : MonoBehaviour {
 		}
 
 		inputs.Set(6, 0, DistanceFromCheckpoint());
-		inputs.Set(7, 0, DistanceFromRoad());
+		inputs.Set(7, 0, GetVelocity().magnitude);
 
 		return brain.FeedForward(inputs);
 	}
@@ -122,7 +122,6 @@ public class CarMovement : MonoBehaviour {
 		for (int i = 2; i < path.Count; i++) {
 			var currDiff = path[i].GetPos() - path[i-1].GetPos();
 			if (prevDiff != currDiff || lastCheckpoint > 3 || i == path.Count-1) {
-			// if (lastCheckpoint > 3 || i == path.Count-1) {
 				path[i-1].SetCheckpoint();
 				checkpoints.Add(path[i]);
 
@@ -215,8 +214,8 @@ public class CarMovement : MonoBehaviour {
 	}
 
 	public float Score() {
-		var checkpointDistF = 1/avgCheckpointDist.Get();
-		var speedF = avgSpeed.Get();
+		var checkpointDistF = completedCheckpoints/avgCheckpointDist.Get();
+		var speedF = avgSpeed.Get() / 2;
 	
 		return checkpointDistF + speedF;
 	}
