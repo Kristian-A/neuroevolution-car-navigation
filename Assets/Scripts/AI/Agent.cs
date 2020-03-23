@@ -16,6 +16,7 @@ public class Agent {
 	private CarMovement car;
 
 	public Agent(CarMovement car) {
+		car.SetAgent(this);
 		this.car = car;
 	}
 
@@ -84,19 +85,6 @@ public class Agent {
 		}
 	}
 	
-	private float DistanceFromRoad() {
-		var path = TileController.GetPath(spawnpoint);
-		float minDistance = float.MaxValue;
-		foreach (Tile tile in path) {
-			float currDist = (car.transform.position - tile.GetWorldPos()).magnitude;
-		
-			if (minDistance > currDist) {
-				minDistance = currDist;
-			}
-		}
-		return minDistance;
-	}
-
 	private float DistanceFromCheckpoint() {
 		var checkpoints = GetCheckpoints(); 
 		var checkpoint = checkpoints[completedCheckpoints];
@@ -107,10 +95,6 @@ public class Agent {
 		}
 
 		return distance;
-	}
-
-	private float DistanceFromStart() {
-		return  (car.transform.position - spawnpoint.GetWorldPos()).magnitude;
 	}
 
 	public void Reset() {

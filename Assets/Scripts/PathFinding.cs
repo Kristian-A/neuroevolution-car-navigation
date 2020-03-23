@@ -32,6 +32,7 @@ public class PathFinding : MonoBehaviour {
 				if (neighbour.IsWall() || closedSet.Contains(neighbour)) {
 					continue;
 				}
+				
 				int newCostToNeighbour = currentTile.Gcost() + GetDistance(currentTile, neighbour);			
 				if (newCostToNeighbour < neighbour.Gcost() || !openSet.Contains(neighbour)) {
 					neighbour.SetG(newCostToNeighbour);

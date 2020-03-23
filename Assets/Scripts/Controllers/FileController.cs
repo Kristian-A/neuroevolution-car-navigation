@@ -55,8 +55,8 @@ public class FileController : MonoBehaviour {
 
 		var DNA = AIController.GetBestEntry().GetDna();
 
-		foreach (var genome in DNA) {
-			File.AppendAllText(path, genome + "\n");
+		foreach (var gene in DNA) {
+			File.AppendAllText(path, gene + "\n");
 		}
 
 	}
@@ -73,10 +73,10 @@ public class FileController : MonoBehaviour {
 			string[] lines = text.Split('\n');
 
 			foreach (string line in lines) {
-				double genome;
+				double gene;
 
-				if (double.TryParse(line, out genome)) {
-					DNA.Add(genome);
+				if (double.TryParse(line, out gene)) {
+					DNA.Add(gene);
 				}
 			}
 		}

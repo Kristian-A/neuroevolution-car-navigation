@@ -34,7 +34,7 @@ public class Matrix {
         return ret;
     }
 
-    public Matrix Transpolate() {
+    public Matrix Transpose() {
         var ret = new Matrix(height, width);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -64,8 +64,10 @@ public class Matrix {
         if (a.width != b.height) {
             return null;
         }
+
         Matrix res = new Matrix(b.width, a.height);
-        b = b.Transpolate();
+        b = b.Transpose();
+        
         for (int ah = 0; ah < a.height; ah++) {
             for (int bh = b.height-1; bh >= 0; bh--) {
                 double sum = 0;
@@ -75,6 +77,7 @@ public class Matrix {
                 res.Set(b.height-bh-1, ah, sum);
             }
         }
+        
         return res;
     }
 

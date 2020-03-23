@@ -53,12 +53,14 @@ public class GeneticAlgorithm {
         const double mutationRate = 0.01;
 
         if (generator.NextDouble() < mutationRate) {
-            int toSwap1 = generator.Next(dna.Count);
-            int toSwap2 = generator.Next(dna.Count);
+            for (int i = 0; i < 30; i++) {
+                int toSwap1 = generator.Next(dna.Count);
+                int toSwap2 = generator.Next(dna.Count);
 
-            double gene = dna[toSwap1];
-            dna[toSwap1] = dna[toSwap2];
-            dna[toSwap2] = gene;
+                double gene = dna[toSwap1];
+                dna[toSwap1] = dna[toSwap2];
+                dna[toSwap2] = gene;
+            }
         }
 
         return dna;

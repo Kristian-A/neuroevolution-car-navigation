@@ -6,7 +6,8 @@ public class Sensor : MonoBehaviour {
 
 	public GameObject car;
 	private Material material;
-	private double currentDistance = 2;
+	private double currentDistance = 3;
+	private double defaultDistance = 3;
 	
 	void Awake () {
 		material = GetComponent<Renderer>().material;
@@ -15,10 +16,10 @@ public class Sensor : MonoBehaviour {
 	public double GetDistance() {
 		return currentDistance;
 	}
+
 	private double Distance(Collider other) {
 		if (CollisionController.IsIgnored(other.tag)) {
-			return 3;
-		
+			return defaultDistance;
 		}
 		var carPos = GetCarPosition();
 		return Vector3.Distance(other.ClosestPoint(carPos), carPos); 
@@ -42,6 +43,7 @@ public class Sensor : MonoBehaviour {
 	} 
 
 	public void OnTriggerExit() {
+		currentDistance = defaultDistance;
 		material.SetColor("_Color", Color.white);
 	}
 }

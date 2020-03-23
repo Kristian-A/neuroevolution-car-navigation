@@ -8,6 +8,7 @@ public class AIController : MonoBehaviour {
 
 	private static List<Agent> agents = new List<Agent>();
 	private static int generationCount = 0;
+	
 	public static int[] nnSize = new int[] {8, 30, 2};
 	public GameObject textfield;
 
@@ -21,8 +22,8 @@ public class AIController : MonoBehaviour {
 	}
 
 	public void Update() {
+		
 		if (CarController.GenerationDone()) {
-
 			Average avgFitness = new Average();
 			var entries = GetEntries(); 
 			
@@ -78,21 +79,19 @@ public class AIController : MonoBehaviour {
 	}
 
 	private static List<List<double>> NextGeneration(List<GeneticAlgorithm.Entry> entries) {
-		entries.Sort((GeneticAlgorithm.Entry a, GeneticAlgorithm.Entry b) => {
-            return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
-        });
-		
-		int half = agents.Count / 2;
+		int oldCount = agents.Count / 2;
 		var pool = new List<List<double>>();
 		
 		pool.Add(GetBestEntry().GetDna());
 
-		for (int i = 0; i < half - 1; i++) {
+		for (int i = 0; i < oldCount - 1; i++) {
 			var entry = GeneticAlgorithm.Pick(entries);
 			pool.Add(entry.GetDna());
 		}
 
-		for (int i = 0; i < half/2; i++) {
+		var parentCount = oldCount / 2;
+		for (int i = 0; i < parentCount; i++) {
+
 			var parent1 = GeneticAlgorithm.Pick(entries);
 			var parent2 = GeneticAlgorithm.Pick(entries);
 			var children = GeneticAlgorithm.Crossover(parent1.GetDna(), parent2.GetDna());
@@ -101,20 +100,7 @@ public class AIController : MonoBehaviour {
 			pool.Add(children[1]);
 		}
 
-		return Shuffle(pool);
-	}
-
-	private static List<T> Shuffle<T>(List<T> l) {
-		for (int j = 0; j < 100; j++) {
-			for (int i = 0; i < l.Count; i++) {
-				T temp = l[i];
-				int randomIndex = UnityEngine.Random.Range(i, l.Count);
-				l[i] = l[randomIndex];
-				l[randomIndex] = temp;
-			}
-		}
-
-		return l;
+		return pool;
 	}
 
 	public static int GenerationCount() {

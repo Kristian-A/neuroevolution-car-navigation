@@ -43,6 +43,7 @@ public class Tile : MonoBehaviour {
 	public void SetWorldPos(Vector3 worldPos) {
 		this.worldPos = worldPos;
 	}
+	
 	public Vector3 GetWorldPos() {
 		return worldPos;
 	}
