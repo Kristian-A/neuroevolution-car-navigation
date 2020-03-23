@@ -8,21 +8,26 @@ public class CarController : MonoBehaviour {
 	public GameObject carPrefab;
 	private static bool demonstrating = false;
 
-	private static List<CarMovement> cars;
+	private static List<CarMovement> cars = new List<CarMovement>();
 	private List<Tile> spawnpoints;
 	private static Timer restartTimer = new Timer(20000);
 	private static bool generationDone = false;
 	
 	void Start() {
 		spawnpoints = TileController.GetSpawnpoints();
-		
-		CarController.cars = new List<CarMovement>();
+		var nnSize = AIController.nnSize; 	    
+
 		for (int i = 0; i < carCount; i++) {
 			Tile currSpawnpoint = spawnpoints[i % spawnpoints.Count];
+			
 			GameObject carObject = Instantiate(carPrefab, currSpawnpoint.GetWorldPos(), Quaternion.identity);
 			CarMovement car = carObject.GetComponent<CarMovement>();
-			car.GetComponent<CarMovement>().SetSpawnpoint(currSpawnpoint);
-
+			
+			Agent agent = new Agent(car);
+			car.SetAgent(agent);
+			agent.SetSpawnpoint(currSpawnpoint);
+			agent.SetBrain(new NeuralNetwork(nnSize[0], nnSize[1], nnSize[2]));
+			
 			CarController.cars.Add(car);
 			List<Collider> colls = car.GetColliders();
 			
@@ -80,7 +85,7 @@ public class CarController : MonoBehaviour {
 
 		brain.SetWeights(DNA);
 
-		simCar.SetBrain(brain);
+		simCar.GetAgent().SetBrain(brain);
 		simCar.gameObject.SetActive(true);
 
 		demonstrating = true;

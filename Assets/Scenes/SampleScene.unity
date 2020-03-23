@@ -1290,7 +1290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12e35e4a72d6d4ea2a9a7f731273dd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carCount: 32
+  carCount: 64
   carPrefab: {fileID: 1094227742374312, guid: e23f4904e37d24508953d93bcba1b972, type: 2}
 --- !u!224 &818843081
 RectTransform:

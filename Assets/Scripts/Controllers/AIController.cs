@@ -6,20 +6,17 @@ using UnityEngine.UI;
 
 public class AIController : MonoBehaviour {
 
-	private static List<CarMovement> cars;
+	private static List<Agent> agents = new List<Agent>();
 	private static int generationCount = 0;
 	public static int[] nnSize = new int[] {8, 30, 2};
 	public GameObject textfield;
 
     public void Start() {
 		GeneticAlgorithm.Seed(0);
-
-		cars = CarController.GetCars();
-		foreach (CarMovement car in cars) {	
-			var nnSize = AIController.nnSize; 	    
-			car.SetBrain(new NeuralNetwork(nnSize[0], nnSize[1], nnSize[2]));
+		var cars = CarController.GetCars();
+		foreach (var car in cars) {
+			agents.Add(car.GetAgent());
 		}
-
 		WriteInfo(0, 0, 0);
 	}
 
@@ -40,7 +37,7 @@ public class AIController : MonoBehaviour {
 			for (int i = 0; i < DNAs.Count; i++) {
 				var brain = new NeuralNetwork(nnSize[0], nnSize[1], nnSize[2]); 
 				brain.SetWeights(DNAs[i]);
-				cars[i].SetBrain(brain);
+				agents[i].SetBrain(brain);
 			}
 		}
 	}
@@ -56,9 +53,9 @@ public class AIController : MonoBehaviour {
 	private static List<GeneticAlgorithm.Entry> GetEntries() {
 		var entries = new List<GeneticAlgorithm.Entry>();
 
-		foreach (CarMovement car in cars) {
-			var dna = car.GetBrain().DNA();
-			var fitness = car.Score();
+		foreach (Agent agent in agents) {
+			var dna = agent.GetBrain().DNA();
+			var fitness = agent.Score();
 			entries.Add(new GeneticAlgorithm.Entry(dna, fitness));
 		}
 
@@ -85,7 +82,7 @@ public class AIController : MonoBehaviour {
             return (int)(Math.Ceiling(b.GetFitness()) - Math.Ceiling(a.GetFitness()));
         });
 		
-		int half = cars.Count / 2;
+		int half = agents.Count / 2;
 		var pool = new List<List<double>>();
 		
 		pool.Add(GetBestEntry().GetDna());
