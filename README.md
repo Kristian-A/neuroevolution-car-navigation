@@ -1,9 +1,9 @@
 # Car Parking AI
 
-Unity/C# project built from scratch. Implements a genetic algorithm which teaches a neural network how to park a simulated vehicle. At first the vehicles go all over the place but as the neural networks continue to evolve the car movements become more accurate.
+Car Parking AI is a Unity/C# project featuring a Neural Network model built and trained from scratch using a Genetic Algorithm. The Genetic Algorithm spawns multiple randomly generated Neural Networks and by Darwinian Evolutionary Theory crosses best performing Neural Networks in order to produce one that finds a solution.
 
-### The scripts are located in Assets/Scripts
+### Source code: Assets/Scripts
+### AI scripts: Assets/Scripts/AI
 
-Course Work for obtaining Technical Diploma
+Course Work for obtaining Technical Highschool Diploma
 Feb 2020
-
